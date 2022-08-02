@@ -21,13 +21,15 @@ class InfoMessage:
 
 class Training:
     """Базовый класс тренировки."""
+    LEN_STEP = 0.65
+    M_IN_KM = 1000
 
     def __init__(self,
                  action: int,
                  duration: float,
                  weight: float,
-                 len_step: float = 0.65,
-                 m_in_km: int = 1000,
+                 len_step: float = LEN_STEP,
+                 m_in_km: int = M_IN_KM,
                  h_in_min: int = 60,
                  ) -> None:
         self.action = action
@@ -103,6 +105,7 @@ class SportsWalking(Training):
 
 class Swimming(Training):
     """Тренировка: плавание."""
+    LEN_STEP = 1.38
 
     def __init__(self,
                  action,
@@ -110,7 +113,7 @@ class Swimming(Training):
                  weight,
                  length_pool: int,
                  count_pool: int,
-                 len_step: float = 1.38,
+                 len_step: float = LEN_STEP,
                  k_1_swm: float = 1.1,
                  ) -> None:
         super().__init__(action, duration, weight)
