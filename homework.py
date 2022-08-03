@@ -1,4 +1,7 @@
+from __future__ import annotations
 from dataclasses import dataclass
+
+import sys
 
 
 @dataclass
@@ -21,8 +24,9 @@ class InfoMessage:
 
 class Training:
     """Базовый класс тренировки."""
-    LEN_STEP = 0.65
-    M_IN_KM = 1000
+    LEN_STEP: float = 0.65
+    M_IN_KM: int = 1000
+    H_IN_MIN: int = 60
 
     def __init__(self,
                  action: int,
@@ -30,7 +34,7 @@ class Training:
                  weight: float,
                  len_step: float = LEN_STEP,
                  m_in_km: int = M_IN_KM,
-                 h_in_min: int = 60,
+                 h_in_min: int = H_IN_MIN,
                  ) -> None:
         self.action = action
         self.duration = duration
@@ -49,7 +53,9 @@ class Training:
 
     def get_spent_calories(self) -> float:
         """Получить количество затраченных калорий."""
-        pass
+        raise NotImplementedError(
+            f'''Переопределите {sys._getframe().f_code.co_name}
+             в классе {self.__class__.__name__}''')
 
     def show_training_info(self) -> InfoMessage:
         """Вернуть информационное сообщение о выполненной тренировке."""
@@ -62,13 +68,15 @@ class Training:
 
 class Running(Training):
     """Тренировка: бег."""
+    K_1_RUN: int = 18
+    K_2_RUN: int = 20
 
     def __init__(self,
                  action,
                  duration,
                  weight,
-                 k_1_run: int = 18,
-                 k_2_run: int = 20,
+                 k_1_run: int = K_1_RUN,
+                 k_2_run: int = K_2_RUN,
                  ) -> None:
         super().__init__(action, duration, weight)
         self.K_1_RUN = k_1_run
@@ -82,14 +90,16 @@ class Running(Training):
 
 class SportsWalking(Training):
     """Тренировка: спортивная ходьба."""
+    K_1_WLK: float = 0.035
+    K_2_WLK: float = 0.029
 
     def __init__(self,
                  action,
                  duration,
                  weight,
                  height: float,
-                 k_1_wlk: float = 0.035,
-                 k_2_wlk: float = 0.029,
+                 k_1_wlk: float = K_1_WLK,
+                 k_2_wlk: float = K_2_WLK,
                  ) -> None:
         super().__init__(action, duration, weight)
         self.height = height
@@ -105,7 +115,8 @@ class SportsWalking(Training):
 
 class Swimming(Training):
     """Тренировка: плавание."""
-    LEN_STEP = 1.38
+    LEN_STEP: float = 1.38
+    K_1_SWM: float = 1.1
 
     def __init__(self,
                  action,
@@ -114,7 +125,7 @@ class Swimming(Training):
                  length_pool: int,
                  count_pool: int,
                  len_step: float = LEN_STEP,
-                 k_1_swm: float = 1.1,
+                 k_1_swm: float = K_1_SWM,
                  ) -> None:
         super().__init__(action, duration, weight)
         self.length_pool = length_pool
@@ -134,8 +145,13 @@ class Swimming(Training):
 
 def read_package(workout_type: str, data: list) -> Training:
     """Прочитать данные полученные от датчиков."""
-    dict = {'SWM': Swimming, 'RUN': Running, 'WLK': SportsWalking}
-    return dict[workout_type](*data)
+    training_codes: dict[str, type[Training]] = {'SWM': Swimming,
+                                                 'RUN': Running,
+                                                 'WLK': SportsWalking}
+    if workout_type in training_codes:
+        return training_codes[workout_type](*data)
+    else:
+        raise KeyError(f'{workout_type} - неизвестный тип тренировки')
 
 
 def main(training: Training) -> None:
