@@ -32,16 +32,10 @@ class Training:
                  action: int,
                  duration: float,
                  weight: float,
-                 len_step: float = LEN_STEP,
-                 m_in_km: int = M_IN_KM,
-                 h_in_min: int = H_IN_MIN,
                  ) -> None:
         self.action = action
         self.duration = duration
         self.weight = weight
-        self.LEN_STEP = len_step
-        self.M_IN_KM = m_in_km
-        self.H_IN_MIN = h_in_min
 
     def get_distance(self) -> float:
         """Получить дистанцию в км."""
@@ -75,12 +69,8 @@ class Running(Training):
                  action,
                  duration,
                  weight,
-                 k_1_run: int = K_1_RUN,
-                 k_2_run: int = K_2_RUN,
                  ) -> None:
         super().__init__(action, duration, weight)
-        self.K_1_RUN = k_1_run
-        self.K_2_RUN = k_2_run
 
     def get_spent_calories(self) -> float:
         """Получить количество затраченных калорий."""
@@ -98,13 +88,9 @@ class SportsWalking(Training):
                  duration,
                  weight,
                  height: float,
-                 k_1_wlk: float = K_1_WLK,
-                 k_2_wlk: float = K_2_WLK,
                  ) -> None:
         super().__init__(action, duration, weight)
         self.height = height
-        self.K_1_WLK = k_1_wlk
-        self.K_2_WLK = k_2_wlk
 
     def get_spent_calories(self) -> float:
         """Получить количество затраченных калорий."""
@@ -124,14 +110,10 @@ class Swimming(Training):
                  weight,
                  length_pool: int,
                  count_pool: int,
-                 len_step: float = LEN_STEP,
-                 k_1_swm: float = K_1_SWM,
                  ) -> None:
         super().__init__(action, duration, weight)
         self.length_pool = length_pool
         self.count_pool = count_pool
-        self.LEN_STEP = len_step
-        self.K_1_SWM = k_1_swm
 
     def get_mean_speed(self) -> float:
         """Получить среднюю скорость движения."""
@@ -148,10 +130,9 @@ def read_package(workout_type: str, data: list) -> Training:
     training_codes: dict[str, type[Training]] = {'SWM': Swimming,
                                                  'RUN': Running,
                                                  'WLK': SportsWalking}
-    if workout_type in training_codes:
-        return training_codes[workout_type](*data)
-    else:
+    if workout_type not in training_codes:
         raise KeyError(f'{workout_type} - неизвестный тип тренировки')
+    return training_codes[workout_type](*data)
 
 
 def main(training: Training) -> None:
